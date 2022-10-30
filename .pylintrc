@@ -1,0 +1,8 @@
+[FORMAT]
+max-line-length=130
+
+# Regexp for a line that is allowed to be longer than the limit.
+ignore-long-lines=^\s*(# )?<?https?://\S+>?$
+
+# Ain't nobody got time for that!
+ignore-pattern=test_.*.py

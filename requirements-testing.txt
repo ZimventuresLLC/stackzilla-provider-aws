@@ -1,0 +1,10 @@
+coverage==6.5.0
+invoke==1.7.1
+isort==5.10.1
+mypy==0.971
+mypy-extensions==0.4.3
+pydocstyle==6.1.1
+pyflakes==2.5.0
+pylint
+pytest
+pytest-cov

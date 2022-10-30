@@ -1,0 +1,41 @@
+#########################################
+# Perform linting on the entire codebase
+# Includes:
+# - iSort
+# - pydocstyle
+# - pylint
+#########################################
+name: lint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        pip install -e .[test]
+        pip install -e .[dev]
+        export PYTHONPATH="$PYTHONPATH:./"
+    - name: Running iSort
+      run: |
+        isort ./'<provider_name>'/
+
+    - name: Running pydocstyle
+      run: |
+        pydocstyle ./'<provider_name>'/
+
+    - name: Running pylint
+      run: |
+        pylint ./'<provider_name>'

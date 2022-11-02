@@ -30,12 +30,12 @@ jobs:
         export PYTHONPATH="$PYTHONPATH:./"
     - name: Running iSort
       run: |
-        isort ./'<provider_name>'/
+        isort ./stackzilla/provider/aws/
 
     - name: Running pydocstyle
       run: |
-        pydocstyle ./'<provider_name>'/
+        pydocstyle ./stackzilla/provider/aws/
 
     - name: Running pylint
       run: |
-        pylint ./'<provider_name>'
+        pylint ./stackzilla/provider/aws'

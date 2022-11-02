@@ -4,15 +4,15 @@ from setuptools import setup
 
 # Meta information
 dirname = os.path.dirname(os.path.realpath(__file__))
-version = open(os.path.join(dirname, '<provider_name>'), encoding='utf-8').read().strip()
+version = open(os.path.join(dirname, 'VERSION'), encoding='utf-8').read().strip()
 
-# Read in all of the requirements to install/run <provider_name>
+# Read in all of the requirements to install/run stackzilla-provider-aws
 install_requirements = []
 with open('requirements.txt', encoding='utf-8') as requirements:
     for package in requirements.readlines():
         install_requirements.append(package)
 
-# Read in all of the requirements to run the tests on the <provider_name> codebase
+# Read in all of the requirements to run the tests on the stackzilla-provider-aws codebase
 testing_requirements = []
 with open('requirements-testing.txt', encoding='utf-8') as testing_req_fh:
     for package in testing_req_fh.readlines():
@@ -25,11 +25,11 @@ with open('requirements-dev.txt', encoding='utf-8') as dev_req_fh:
 
 setup(
     # Basic package info
-    name='<provider_name>',
+    name='stackzilla-provider-aws',
     version=version,
-    author='<provider_name>, LLC',
+    author='Zimventures, LLC',
     author_email='yourname@yourdomain.com',
-    url='https://github.com/Stackzilla/<provider_name>',
+    url='https://github.com/Stackzilla/stackzilla-provider-aws',
     description='An ORM for your application stack.',
     long_description=open('README.md', encoding='utf-8').read(),
     license='GNU Affero General Public License v3',
@@ -47,7 +47,7 @@ setup(
     ],
 
     # Packages and dependencies
-    packages=['stackzilla.provider.<provider_name>'],
+    packages=['stackzilla.provider.aws'],
     python_requires='>3.7',
     include_package_data=True,
     install_requires=install_requirements,

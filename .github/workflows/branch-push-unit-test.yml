@@ -24,4 +24,4 @@ jobs:
         pip install -e .[dev]
     - name: Running tests
       run: |
-        pytest ./<provider_name>/
+        pytest ./stackzilla/provider/aws

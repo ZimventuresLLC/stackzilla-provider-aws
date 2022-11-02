@@ -1,7 +1,7 @@
 """Tasks that can be executed via 'invoke <cmd>' for developers."""
 from invoke import task
 
-SOURCE_ROOT = '<provider_name>'
+SOURCE_ROOT = 'stackzilla/provider/aws'
 
 @task
 def clean(c):

@@ -102,7 +102,8 @@ class AWSSecurityGroup(StackzillaResource):
 
     def create(self) -> None:
         """Called when the resource is created."""
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
 
         self._logger.debug(message=f'Creating {self.name}')
 
@@ -125,7 +126,8 @@ class AWSSecurityGroup(StackzillaResource):
         self.group_id = results['GroupId']
 
         # Forumulate the arn
-        sts_client = boto3.client('sts', region_name=self.region)
+        boto_session = boto3.session.Session()
+        sts_client = boto_session.client('sts', region_name=self.region)
         account_id = sts_client.get_caller_identity()['Account']
         self.arn = f'arn:aws:ec2:{self.region}:{account_id}:security-group/{self.group_id}'
 
@@ -154,7 +156,8 @@ class AWSSecurityGroup(StackzillaResource):
         """Delete a previously created key pair."""
         self._logger.debug(message=f'Deleting {self.group_id}')
 
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
         client.delete_security_group(GroupId=self.group_id)
         super().delete()
 
@@ -182,7 +185,8 @@ class AWSSecurityGroup(StackzillaResource):
             new_value (Optional[List[AWSSecurityGroupRule]]): The new list of ingress rules
         """
 
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
         # For the first pass, add any new rules
         if new_value is not None:
             for rule in new_value:
@@ -208,7 +212,8 @@ class AWSSecurityGroup(StackzillaResource):
             new_value (Optional[List[AWSSecurityGroupRule]]): The new list of egress rules
         """
 
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
         # For the first pass, add any new rules
         if new_value is not None:
             for rule in new_value:

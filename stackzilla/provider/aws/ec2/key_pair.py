@@ -35,7 +35,8 @@ class AWSKeyPair(StackzillaResource):
 
     def create(self) -> None:
         """Called when the resource is created."""
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
 
         self._logger.debug(message='Starting KeyPair creation')
 
@@ -75,7 +76,8 @@ class AWSKeyPair(StackzillaResource):
         """Delete a previously created key pair."""
         self._logger.debug(message=f'Deleting {self.key_pair_id}')
 
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
         client.delete_key_pair(KeyName=self.name)
         super().delete()
 

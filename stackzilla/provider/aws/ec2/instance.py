@@ -65,7 +65,8 @@ class AWSInstance(StackzillaCompute):
 
     def create(self) -> None:
         """Called when the resource is created."""
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
 
         self._logger.debug(message='Starting instance creation')
 
@@ -129,7 +130,8 @@ class AWSInstance(StackzillaCompute):
         """Delete a previously created instance."""
         self._logger.debug(message='Deleting')
 
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
         client.terminate_instances(InstanceIds=[self.instance_id])
 
         # Wait for the instance to terminate
@@ -166,7 +168,8 @@ class AWSInstance(StackzillaCompute):
         Raises:
             ComputeStartError: Raised on an error
         """
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
         self._logger.debug('Starting instance')
 
         client.start_instances(InstanceIds=[self.instance_id])
@@ -188,7 +191,8 @@ class AWSInstance(StackzillaCompute):
         Raises:
             ComputeStopError: Raised when an error occurs
         """
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
         self._logger.debug('Stopping instance')
         client.stop_instances(InstanceIds=[self.instance_id])
 
@@ -214,7 +218,8 @@ class AWSInstance(StackzillaCompute):
             new_value (bool): The new API termination setting
         """
         self._logger.debug(f'Updating disable_api_termination from {previous_value} to {new_value}')
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
 
         try:
             client.modify_instance_attribute(InstanceId=self.instance_id,
@@ -232,7 +237,8 @@ class AWSInstance(StackzillaCompute):
             new_value (bool): The new EBS Optimization setting
         """
         self._logger.debug(f'Updating ebs_optimized from {previous_value} to {new_value}')
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
 
         try:
             client.modify_instance_attribute(InstanceId=self.instance_id,
@@ -251,7 +257,8 @@ class AWSInstance(StackzillaCompute):
             new_value (Optional[List[AWSSecurityGroup]]): The new list of security groups
         """
         self._logger.debug(f'Updating security_groups from {previous_value} to {new_value}')
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
 
         try:
             security_groups: List[str] = []
@@ -274,7 +281,8 @@ class AWSInstance(StackzillaCompute):
             new_value (str): The new instance type
         """
         self._logger.debug(f'Updating instance type from {previous_value} to {new_value}')
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
 
         instance_was_running = True
         if self._get_instance_state() in ['shutting-down', 'terminated', 'stopping', 'stopped']:
@@ -304,7 +312,8 @@ class AWSInstance(StackzillaCompute):
             new_value (str): The new user_data value
         """
         self._logger.debug('Updating user_data')
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
 
         try:
             client.modify_instance_attribute(InstanceId=self.instance_id,
@@ -319,7 +328,8 @@ class AWSInstance(StackzillaCompute):
         Returns:
             str: 'pending'|'running'|'shutting-down'|'terminated'|'stopping'|'stopped'
         """
-        client = boto3.client('ec2', region_name=self.region)
+        boto_session = boto3.session.Session()
+        client = boto_session.client('ec2', region_name=self.region)
         response = client.describe_instance_status(InstanceIds=[self.instance_id])
 
         if len(response['InstanceStatuses']) == 0:

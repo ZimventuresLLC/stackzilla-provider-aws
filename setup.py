@@ -1,6 +1,6 @@
 """Setuptools configuration file."""
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # Meta information
 dirname = os.path.dirname(os.path.realpath(__file__))
@@ -48,7 +48,7 @@ setup(
     ],
 
     # Packages and dependencies
-    packages=['stackzilla.provider.aws'],
+    packages=find_packages('stackzilla.provider.aws'),
     python_requires='>3.7',
     include_package_data=True,
     install_requires=install_requirements,

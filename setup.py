@@ -48,7 +48,9 @@ setup(
     ],
 
     # Packages and dependencies
-    packages=find_packages('stackzilla.provider.aws'),
+    packages=['stackzilla.provider.aws.ec2',
+              'stackzilla.provider.aws.eks',
+              'stackzilla.provider.aws.utils'],
     python_requires='>3.7',
     include_package_data=True,
     install_requires=install_requirements,

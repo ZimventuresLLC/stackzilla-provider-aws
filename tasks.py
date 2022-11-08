@@ -7,6 +7,10 @@ SOURCE_ROOT = 'stackzilla/provider/aws'
 def clean(c):
     """Clean out any build files or Python caches."""
     c.run('py3clean .')
+    c.run('rm -rf build')
+    c.run('rm -rf dist')
+    c.run('rm -rf stackzilla_provider_aws.egg-info')
+
 
 @task
 def lint(c):

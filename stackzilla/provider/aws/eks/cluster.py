@@ -12,7 +12,6 @@ from stackzilla.resource import StackzillaResource, ResourceVersion
 from stackzilla.resource.kubernetes import StackzillaKubernetes
 from stackzilla.resource.exceptions import ResourceCreateFailure, AttributeModifyFailure
 from stackzilla.provider.aws.utils.regions import REGION_NAMES
-from stackzilla.provider.aws.utils.tags import dict_to_boto_tags
 
 
 @dataclass
@@ -99,7 +98,7 @@ class AWSEKSCluster(StackzillaKubernetes):
             create_args['logging']['clusterLogging'] = self.logging.to_boto()
 
         if self.tags:
-            create_args['tags'] = dict_to_boto_tags(self.tags)
+            create_args['tags'] = self.tags
 
         # Creation parameter refrence
         # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/eks.html#EKS.Client.create_cluster

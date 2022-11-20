@@ -35,7 +35,7 @@ class AWSSecurityGroupRule:
     protocol: str = "-1"
 
     # source_group can be either a string (a souce group name) or an AWSSecurityGroup resource
-    souce_group: Optional[Union[Type['AWSSecurityGroup'], str]] = None
+    source_group: Optional[Union[Type['AWSSecurityGroup'], str]] = None
 
     # The end of the protocol port range the rule applies to
     to_port: Optional[int] = None
@@ -48,21 +48,21 @@ class AWSSecurityGroupRule:
 
         # Sanity check that either source_group or cidr_blocks is specified
 
-        if self.cidr_blocks and self.souce_group:
+        if self.cidr_blocks and self.source_group:
             raise ValueError('"cidr_blocks" and "source_group" fields are mutually exclusive')
 
-        if self.cidr_blocks is None and self.souce_group is None:
+        if self.cidr_blocks is None and self.source_group is None:
             raise ValueError('One of "cidr_blocks" or "source_group" fields must be specified')
 
-        if self.souce_group is not None:
+        if self.source_group is not None:
 
             # The sounce_group parameter is a string
-            if isinstance(self.souce_group, str):
-                rule['UserIdGroupPairs'] = [{'GroupName': self.souce_group}]
+            if isinstance(self.source_group, str):
+                rule['UserIdGroupPairs'] = [{'GroupName': self.source_group}]
 
             # The source_group parameter is an AWSSecurityGroup resource - use the ID
-            elif issubclass(self.souce_group, AWSSecurityGroup):
-                source_obj = self.souce_group()
+            elif issubclass(self.source_group, AWSSecurityGroup):
+                source_obj = self.source_group()
                 source_obj.load_from_db()
                 rule['UserIdGroupPairs'] = [{'GroupId': str(source_obj.group_id)}]
 

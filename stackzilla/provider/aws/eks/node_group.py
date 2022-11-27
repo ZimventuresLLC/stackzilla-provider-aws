@@ -5,18 +5,21 @@ from typing import List
 
 import boto3
 import botocore
-
 from stackzilla.attribute import StackzillaAttribute
 from stackzilla.logger.provider import ProviderLogger
-from stackzilla.provider.aws.eks.cluster import AWSEKSCluster
+from stackzilla.resource import ResourceVersion, StackzillaResource
+from stackzilla.resource.exceptions import ResourceCreateFailure
+
 from stackzilla.provider.aws.ec2.key_pair import AWSKeyPair
 from stackzilla.provider.aws.ec2.security_group import AWSSecurityGroup
+from stackzilla.provider.aws.eks.cluster import AWSEKSCluster
 from stackzilla.provider.aws.utils.instances import INSTANCE_TYPES
 from stackzilla.provider.aws.utils.tags import dict_to_boto_tags
-from stackzilla.resource import StackzillaResource, ResourceVersion
-from stackzilla.resource.exceptions import ResourceCreateFailure, AttributeModifyFailure
+
 
 class TaintEffect(Enum):
+    """Values allowed for the effect field in the Taint dataclass."""
+
     NO_SCHEDULE = 'NO_SCHEDULE'
     NO_EXECUTE = 'NO_EXECUTE'
     PREFER_NO_SCHEDULE = 'PREFER_NO_SCHEDULE'
@@ -52,7 +55,6 @@ class AWSEKSNodeGroup(StackzillaResource):
     disk_size = StackzillaAttribute(required=False)
     instance_types = StackzillaAttribute(required=False, choices=INSTANCE_TYPES)
     labels = StackzillaAttribute(required=False)
-    # TODO: Support launch templates
     min_node_count = StackzillaAttribute(required=False)
     max_node_count = StackzillaAttribute(required=False)
     ssh_key = StackzillaAttribute(required=False, types=[str, AWSKeyPair])
@@ -69,8 +71,9 @@ class AWSEKSNodeGroup(StackzillaResource):
         self._logger = ProviderLogger(provider_name='aws.eks.cluster',
                                       resource_name=self.path(remove_prefix=True))
 
+    # pylint: disable=too-many-branches
     def create(self) -> None:
-        """Create the node group"""
+        """Create the node group."""
         boto_session = boto3.session.Session()
         client = boto_session.client('eks', region_name=self.region)
 
@@ -107,14 +110,8 @@ class AWSEKSNodeGroup(StackzillaResource):
         if self.ami_type:
             create_args['amiType'] = self.ami_type
 
-        # TODO: Implement this...
-        """
-        if self.ssh_key:
-            if issubclass(AWSKeyPair, self.ssh_key):
-                key = self.ssh_key().load_from_db().
-
-            create_args['remoteAccess']['ec2SshKey']
-        """
+        # Implement SSH Key support
+        # https://github.com/Stackzilla/stackzilla-provider-aws/issues/8
 
         if self.iam_role:
             create_args['nodeRole'] = self.iam_role
@@ -144,8 +141,9 @@ class AWSEKSNodeGroup(StackzillaResource):
         waiter.wait(clusterName=cluster_name, nodegroupName=self.name)
 
         self._logger.debug(f'Creation complete: {self.arn}')
+
     def delete(self) -> None:
-        """Delete the node group"""
+        """Delete the node group."""
         boto_session = boto3.session.Session()
         client = boto_session.client('eks', region_name=self.region)
 
@@ -168,10 +166,10 @@ class AWSEKSNodeGroup(StackzillaResource):
         return [self.cluster]
 
     def verify(self) -> None:
+        """Verify attributes of the node group."""
+        # Add custom verifications per this ticket:
+        # https://github.com/Stackzilla/stackzilla-provider-aws/issues/9
 
-        # TODO: Do not set desired_node_count if cluster autoscaling is on
-        # TODO: disk size and launch template can not both be defined
-        pass
 
     @classmethod
     def version(cls) -> ResourceVersion:

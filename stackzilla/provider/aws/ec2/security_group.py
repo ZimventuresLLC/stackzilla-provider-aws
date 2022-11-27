@@ -5,10 +5,12 @@ from typing import Dict, List, Optional, Type, Union
 import boto3
 from stackzilla.attribute import StackzillaAttribute
 from stackzilla.logger.provider import ProviderLogger
+from stackzilla.resource.base import ResourceVersion, StackzillaResource
+
 from stackzilla.provider.aws.utils.arn import ARN
 from stackzilla.provider.aws.utils.regions import REGION_NAMES
 from stackzilla.provider.aws.utils.tags import dict_to_boto_tags, update_tags
-from stackzilla.resource.base import ResourceVersion, StackzillaResource
+
 
 @dataclass
 class IPAddressRange:
@@ -97,7 +99,7 @@ class AWSSecurityGroup(StackzillaResource):
     def __init__(self):
         """Set up logging for the provider."""
         super().__init__()
-        self._logger = ProviderLogger(provider_name='aws.ec2.ssh_key',
+        self._logger = ProviderLogger(provider_name='aws.ec2.security_group',
                                       resource_name=self.path(remove_prefix=True))
 
     def create(self) -> None:
@@ -178,13 +180,12 @@ class AWSSecurityGroup(StackzillaResource):
     ######################################################################
     def ingress_modified(self, previous_value: Optional[List[AWSSecurityGroupRule]],
                                new_value: Optional[List[AWSSecurityGroupRule]]) -> None:
-        """Called when the ingress argument is modified
+        """Called when the ingress argument is modified.
 
         Args:
             previous_value (Optional[List[AWSSecurityGroupRule]]): The previous list of ingress rules
             new_value (Optional[List[AWSSecurityGroupRule]]): The new list of ingress rules
         """
-
         boto_session = boto3.session.Session()
         client = boto_session.client('ec2', region_name=self.region)
         # For the first pass, add any new rules
@@ -205,13 +206,12 @@ class AWSSecurityGroup(StackzillaResource):
 
     def egress_modified(self, previous_value: Optional[List[AWSSecurityGroupRule]],
                               new_value: Optional[List[AWSSecurityGroupRule]]) -> None:
-        """Called when the egress argument is modified
+        """Called when the egress argument is modified.
 
         Args:
             previous_value (Optional[List[AWSSecurityGroupRule]]): The previous list of egress rules
             new_value (Optional[List[AWSSecurityGroupRule]]): The new list of egress rules
         """
-
         boto_session = boto3.session.Session()
         client = boto_session.client('ec2', region_name=self.region)
         # For the first pass, add any new rules
@@ -231,7 +231,7 @@ class AWSSecurityGroup(StackzillaResource):
                     client.revoke_security_group_egress(GroupId=self.group_id, IpPermissions=[rule.to_boto()])
 
     def tags_modified(self, previous_value: Optional[Dict[str, str]], new_value: Optional[Dict[str, str]]) -> None:
-        """Handler for when the tags attribute is modified
+        """Handler for when the tags attribute is modified.
 
         Args:
             previous_value (Optional[Dict[str, str]]): The previous tag value
@@ -247,14 +247,12 @@ def sg_list_to_boto_id_list(security_groups: List[Union[AWSSecurityGroup, str]])
     """Convert a list of AWSSecurityGroup resources into a list of AWS security group IDs.
 
         NOTE: The list may contain "raw" strings, which are considered to simply be security group IDs.
-
     Args:
         security_groups (List[AWSSecurityGroup]): A list of AWSSecurityGroup resources
 
     Returns:
         List[str]: List of AWS security group IDs
     """
-
     result = []
     for group in security_groups:
         if issubclass(group, str):

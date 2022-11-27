@@ -5,18 +5,20 @@ from typing import Dict, List, Union
 
 import boto3
 import botocore
-
 from stackzilla.attribute import StackzillaAttribute
 from stackzilla.logger.provider import ProviderLogger
-from stackzilla.resource import StackzillaResource, ResourceVersion
+from stackzilla.resource import ResourceVersion, StackzillaResource
+from stackzilla.resource.exceptions import (AttributeModifyFailure,
+                                            ResourceCreateFailure)
 from stackzilla.resource.kubernetes import StackzillaKubernetes
-from stackzilla.resource.exceptions import ResourceCreateFailure, AttributeModifyFailure
+
 from stackzilla.provider.aws.utils.regions import REGION_NAMES
 
 
 @dataclass
 class ClusterLogging:
-    """Flags for controlling cluster loging"""
+    """Flags for controlling cluster loging."""
+
     api: bool = False
     audit: bool = False
     authenticator: bool = False
@@ -42,8 +44,6 @@ class AWSEKSCluster(StackzillaKubernetes):
 
     # See https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html#create-service-role for creating a role
     role_arn = StackzillaAttribute(required=True, modify_rebuild=True)
-
-    # TODO: Write a verifier to make sure all of the subnet IDs exist, and are in at least 2 different AZs
     subnets = StackzillaAttribute(required=False)
 
     # User configured attributes (optional)
@@ -80,7 +80,6 @@ class AWSEKSCluster(StackzillaKubernetes):
             'publicAccessCidrs': self.public_access_cidrs,
         }
 
-        # TODO: Support AWSSecurityGroup objects in addition to raw Security Group ID strings
         if self.security_groups:
             resources_vpc_config['securityGroupIds'] = self.security_groups
 
@@ -166,9 +165,9 @@ class AWSEKSCluster(StackzillaKubernetes):
         """Fetch the endpoint used to connect to this cluster."""
         return self.endpoint
 
+    # pylint: disable=too-many-locals
     def get_nodes(self) -> List[List[str]]:
         """Get a list of the worker nodes."""
-
         session = boto3.session.Session()
         eks_client = session.client('eks', region_name=self.region)
         ec2_client = session.client('ec2', region_name=self.region)

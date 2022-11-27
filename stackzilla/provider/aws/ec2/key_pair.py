@@ -1,15 +1,17 @@
 """AWS Key Pair resource definition for Stackzilla."""
 from typing import Dict, List, Optional
 
-import botocore
 import boto3
+import botocore
 from stackzilla.attribute import StackzillaAttribute
 from stackzilla.logger.provider import ProviderLogger
+from stackzilla.resource.base import ResourceVersion, StackzillaResource
 from stackzilla.resource.exceptions import ResourceCreateFailure
+
 from stackzilla.provider.aws.utils.arn import ARN
 from stackzilla.provider.aws.utils.regions import REGION_NAMES
 from stackzilla.provider.aws.utils.tags import dict_to_boto_tags, update_tags
-from stackzilla.resource.base import ResourceVersion, StackzillaResource
+
 
 class AWSKeyPair(StackzillaResource):
     """Resource definition for a <provider_name> volume."""
@@ -89,7 +91,7 @@ class AWSKeyPair(StackzillaResource):
         return result
 
     def tags_modified(self, previous_value: Optional[Dict[str, str]], new_value: Optional[Dict[str, str]]) -> None:
-        """Handler for when the tags attribute is modified
+        """Handler for when the tags attribute is modified.
 
         Args:
             previous_value (Optional[Dict[str, str]]): The previous tag value

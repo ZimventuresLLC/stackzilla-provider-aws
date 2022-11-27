@@ -2,7 +2,9 @@
 from typing import Any, Dict, List
 
 import boto3
+
 from stackzilla.provider.aws.utils.arn import ARN
+
 
 def dict_to_boto_tags(tags: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Convert a standard Python dictionary to the expected format for boto.
@@ -28,7 +30,6 @@ def update_tags(arn: ARN, previous_value: Dict[str, str], new_value: Dict[str, s
         previous_value (Dict[str, str]): The previous dictionary of tags
         new_value (Dict[str, str]): The new dictionary of tags
     """
-
     # Decompose the ARN into its component parts
     boto_session = boto3.session.Session()
     client = boto_session.client('resourcegroupstaggingapi', region_name=arn.region)

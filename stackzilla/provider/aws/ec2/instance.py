@@ -1,21 +1,26 @@
 """Resource definition for AWS EC2 instances."""
 from typing import List, Optional
 
-import botocore
 import boto3
+import botocore
 from stackzilla.attribute import StackzillaAttribute
 from stackzilla.logger.provider import ProviderLogger
-from stackzilla.resource.exceptions import ResourceCreateFailure
-from stackzilla.provider.aws.ec2.key_pair import AWSKeyPair
-from stackzilla.provider.aws.ec2.security_group import AWSSecurityGroup, sg_list_to_boto_id_list
-from stackzilla.provider.aws.utils.regions import REGION_NAMES
-from stackzilla.provider.aws.utils.instances import INSTANCE_TYPES
-
 from stackzilla.resource.base import AttributeModifyFailure, ResourceVersion
-from stackzilla.resource.compute import StackzillaCompute, SSHCredentials, SSHAddress
+from stackzilla.resource.compute import (SSHAddress, SSHCredentials,
+                                         StackzillaCompute)
+from stackzilla.resource.compute.exceptions import SSHConnectError
+from stackzilla.resource.exceptions import ResourceCreateFailure
+
+from stackzilla.provider.aws.ec2.key_pair import AWSKeyPair
+from stackzilla.provider.aws.ec2.security_group import (
+    AWSSecurityGroup, sg_list_to_boto_id_list)
+from stackzilla.provider.aws.utils.instances import INSTANCE_TYPES
+from stackzilla.provider.aws.utils.regions import REGION_NAMES
+
 
 class AWSInstance(StackzillaCompute):
     """Resource definition for an AWS EC2 Instance."""
+
     # Dynamic parameters (determined at create)
     instance_id = StackzillaAttribute(dynamic=True)
     private_ip = StackzillaAttribute(dynamic=True)
@@ -126,6 +131,16 @@ class AWSInstance(StackzillaCompute):
         # Save with the updated information
         super().update()
 
+        # Wait up to two minutes for the server to come online
+        try:
+            self._logger.debug(message=f'Waiting up to 5 minutes for SSH to become available on {self.ssh_address().host}')
+            self.wait_for_ssh(retry_count=60, retry_delay=5)
+        except SSHConnectError as exc:
+            self._logger.critical(f'Instance creation failed: {str(exc)}')
+            raise ResourceCreateFailure(reason='Unable to establish SSH connection.', resource_name=self.path()) from exc
+
+        self._logger.debug(message=f'Instance creation complete {self.instance_id}')
+
     def delete(self) -> None:
         """Delete a previously created instance."""
         self._logger.debug(message='Deleting')
@@ -180,7 +195,8 @@ class AWSInstance(StackzillaCompute):
             waiter.wait(InstanceIds=[self.instance_id])
             self._logger.debug('Instance has started')
 
-        # TODO: The public IP addresses may have changed - save them here
+        # The public IP addresses may have changed - save them here
+        # https://github.com/Stackzilla/stackzilla-provider-aws/issues/6
 
     def stop(self, wait_for_offline: bool) -> None:
         """Stops the running instance.
@@ -304,6 +320,7 @@ class AWSInstance(StackzillaCompute):
 
         self._logger.debug('Instance type update complete')
 
+    # pylint: disable=unused-argument
     def user_data_modified(self, previous_value: str, new_value: str) -> None:
         """Called when the user_data attribute is modified.
 
@@ -322,6 +339,7 @@ class AWSInstance(StackzillaCompute):
             raise AttributeModifyFailure(attribute_name='type', reason=str(exc)) from exc
 
         self._logger.debug('user_data update complete')
+
     def _get_instance_state(self) -> str:
         """Fetch the current state of the instance.
 

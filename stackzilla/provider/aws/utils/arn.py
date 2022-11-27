@@ -1,7 +1,7 @@
 """Helper functions for dealing with AWS ARNs."""
 import re
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
 
 # This regular expression will decompose an ARN into its component parts
 # pylint: disable=line-too-long

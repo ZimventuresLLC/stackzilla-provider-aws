@@ -38,4 +38,4 @@ jobs:
 
     - name: Running pylint
       run: |
-        pylint ./stackzilla/provider/aws'
+        pylint ./stackzilla/provider/aws/

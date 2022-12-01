@@ -27,15 +27,15 @@ class AWSInstance(StackzillaCompute):
     public_ip = StackzillaAttribute(dynamic=True)
 
     # User-defined parameters
-    ami = StackzillaAttribute(required=True, modify_rebuild=True)
-    disable_api_termination = StackzillaAttribute(required=False, default=False, choices=[True, False])
-    ebs_optimized = StackzillaAttribute(required=False, default=False, choices=[True, False])
-    name = StackzillaAttribute(required=True, modify_rebuild=False)
-    region = StackzillaAttribute(required=True, choices=REGION_NAMES)
+    ami: str = StackzillaAttribute(required=True, modify_rebuild=True)
+    disable_api_termination: bool = StackzillaAttribute(required=False, default=False, choices=[True, False])
+    ebs_optimized: bool = StackzillaAttribute(required=False, default=False, choices=[True, False])
+    name: str = StackzillaAttribute(required=True, modify_rebuild=False)
+    region: str = StackzillaAttribute(required=True, choices=REGION_NAMES)
 
     # This is a list of either security group names, or AWSSecurityGroup objects
     security_groups = StackzillaAttribute(required=False)
-    ssh_key = StackzillaAttribute(required=True, types=[AWSKeyPair])
+    ssh_key: AWSKeyPair = StackzillaAttribute(required=True, types=[AWSKeyPair])
     ssh_username = StackzillaAttribute(required=True, types=[str])
     tags = StackzillaAttribute(required=False, modify_rebuild=False)
     type = StackzillaAttribute(required=True, choices=INSTANCE_TYPES)

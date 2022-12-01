@@ -49,9 +49,9 @@ class MyServer(AWSInstance):
         self.users = [HostUser(name='zim', password='zim', extra_groups='netadmins')]
 
         # Amazon Linux 2 AMI
-        # self.ami = 'ami-0c4e4b4eb2e11d1d4'
-        # self.ssh_username = 'ec2-user'
-        # self.packages = ['httpd']
+        self.ami = 'ami-0c4e4b4eb2e11d1d4'
+        self.ssh_username = 'ec2-user'
+        self.packages = ['httpd']
 
         # Centos 7
         #self.ami = 'ami-0df157613dfbb5b36'

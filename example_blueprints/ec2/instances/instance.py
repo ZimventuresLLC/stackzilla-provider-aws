@@ -37,7 +37,7 @@ class MyServer(AWSInstance):
         """Define the server attributes."""
         super().__init__()
 
-        self.on_create_done.attach(handler=self.restart_apache)
+        self.create_done_event.attach(handler=self.restart_apache)
 
         self.name = 'my-demo-server'
         self.region = 'us-east-1'

@@ -77,8 +77,7 @@ class AWSEKSNodeGroup(StackzillaResource):
         boto_session = boto3.session.Session()
         client = boto_session.client('eks', region_name=self.region)
 
-        cluster_obj = self.cluster()
-        cluster_obj.load_from_db()
+        cluster_obj = self.cluster.from_db()
         cluster_name = cluster_obj.name
 
         create_args = {
@@ -147,8 +146,7 @@ class AWSEKSNodeGroup(StackzillaResource):
         boto_session = boto3.session.Session()
         client = boto_session.client('eks', region_name=self.region)
 
-        cluster_obj = self.cluster()
-        cluster_obj.load_from_db()
+        cluster_obj = self.cluster.from_db()
         cluster_name = cluster_obj.name
 
         self._logger.debug(f'Deleting {self.arn}')

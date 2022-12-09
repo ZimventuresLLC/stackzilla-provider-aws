@@ -64,8 +64,7 @@ class AWSSecurityGroupRule:
 
             # The source_group parameter is an AWSSecurityGroup resource - use the ID
             elif issubclass(self.source_group, AWSSecurityGroup):
-                source_obj = self.source_group()
-                source_obj.load_from_db()
+                source_obj = self.source_group.from_db()
                 rule['UserIdGroupPairs'] = [{'GroupId': str(source_obj.group_id)}]
 
         elif self.cidr_blocks:
@@ -258,8 +257,7 @@ def sg_list_to_boto_id_list(security_groups: List[Union[AWSSecurityGroup, str]])
         if issubclass(group, str):
             result.append(group)
         elif issubclass(group, AWSSecurityGroup):
-            sg_obj: AWSSecurityGroup = group()
-            sg_obj.load_from_db()
+            sg_obj: AWSSecurityGroup = group.from_db()
             result.append(sg_obj.group_id)
         else:
             raise ValueError('Unsupported type passed in')

@@ -50,8 +50,7 @@ class AWSInstance(StackzillaCompute):
     def ssh_credentials(self) -> SSHCredentials:
         """Provide the credentials needed to SSH into a host."""
         # Get the SSH key data
-        ssh_key_obj = self.ssh_key()
-        ssh_key_obj.load_from_db()
+        ssh_key_obj = self.ssh_key.from_db()
 
         # The key data must be binary encoded, otherwise ssh2-lib thinks it's a file path!
         return SSHCredentials(username=self.ssh_username, password=None, key=ssh_key_obj.key_material.encode())
@@ -76,8 +75,7 @@ class AWSInstance(StackzillaCompute):
         self._logger.debug(message='Starting instance creation')
 
         # Get the SSH key name
-        ssh_key_obj = self.ssh_key()
-        ssh_key_obj.load_from_db()
+        ssh_key_obj = self.ssh_key.from_db()
         ssh_key_name = ssh_key_obj.name
 
         create_args = {
